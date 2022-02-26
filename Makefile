@@ -7,6 +7,8 @@ DRA             := dra
 # Compilers
 CROSS           := mipsel-linux-gnu-
 AS              := $(CROSS)as
+ASPSXTEST       := docker run --rm -w /work -it -v ${PWD}:/work $(docker build -q -f tools/Dockerfile.psyq -t xeeynamo/aspsx .) /bin/bash
+ASPSX           := docker run --rm -w /work -v ${PWD}:/work $(docker build -q -f tools/Dockerfile.psyq -t xeeynamo/aspsx .) wine /app/ASPSX.EXE
 CC              := ./bin/cc1-26
 LD              := $(CROSS)ld
 CPP				:= $(CROSS)cpp
@@ -145,7 +147,11 @@ $(BUILD_DIR)/%.s.o: %.s
 $(BUILD_DIR)/%.bin.o: %.bin
 	$(LD) -r -b binary -o $@ $<
 $(BUILD_DIR)/%.c.o: $(BUILD_DIR)/%.c.s
-	$(AS) $(AS_FLAGS) -o $@ $<
+#$(AS) $(AS_FLAGS) -o $@ $<
+	$(ASPSXTEST) build/src/dra/
+	$(ASPSX) $<
+	$(ASPSXTEST) build/src/dra/
+	./bin/psyq-obj-parser $@.obj -o $@
 $(BUILD_DIR)/%.c.s: %.c
 	$(CPP) $(CPP_FLAGS) $< | $(CC) $(CC_FLAGS) -o $@
 

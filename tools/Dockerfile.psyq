@@ -1,0 +1,10 @@
+FROM ubuntu:latest
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN dpkg --add-architecture i386
+RUN apt update
+RUN apt-get install -y wine32 xvfb
+
+ENV DISPLAY=:0.0
+WORKDIR /app
+COPY bin/ASPSX.EXE /app/
